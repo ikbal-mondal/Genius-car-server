@@ -15,8 +15,9 @@ const uri = "mongodb+srv://CarDB:rRhde6hoqRivRMIJ@cluster0.vcnuad9.mongodb.net/?
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
-function verifyJWT(req, res, nex){
+function verifyJWT(req, res, next){
     const authHeader = req.headers.authorization;
+    console.log(authHeader);
     if(!authHeader){
         return res.status(401).send({message: 'unauthorized access'});
 
@@ -42,7 +43,7 @@ async function run() {
 app.post('/jwt', (req,res) =>{
 
     const user = req.body;
-     const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'})
+     const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'})
      res.send({token})
 
 } )
@@ -65,9 +66,9 @@ app.get('/services/:id', async (req,res) => {
 
 
 // orders api 
-app.get('/orders', verifyJWT,  async (req,res) => {
-    const decoded = req.decoded;
-    console.log(token , decoded);
+app.get('/orders',   async (req,res) => {
+   
+   
     let query = {};
    if(req.query.email){
     query ={
@@ -85,10 +86,10 @@ app.post('/orders', verifyJWT, async (req,res) => {
   
     const order = req.body;
     const result = await orderCollection.insertOne(order)
+    console.log(result);
     res.send(result)
-    const decoded = req.decoded
-    res.send({message: 'unauthorize access'})
-
+    
+  
 })
 
 app.patch('/orders/:id', verifyJWT, async(req,res) => {
